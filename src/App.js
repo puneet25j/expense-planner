@@ -1,41 +1,68 @@
-import React,{useState} from "react"
+import React,{useEffect, useState} from "react"
 
+import { API_KEY } from "./API";
 import Expenses from './components/Expenses/Expenses'
 import NewExpense from './components/NewExpense/NewExpense';
 
-const DUMMY_EXPENSES = [
-  {
-    id: "e1",
-    title: "Toilet Paper",
-    amount: 94.12,
-    date: new Date(2020, 7, 14),
-  },
-  { id: "e2", title: "New TV", amount: 799.49, date: new Date(2021, 2, 12) },
-  {
-    id: "e3",
-    title: "Car Insurance",
-    amount: 294.67,
-    date: new Date(2021, 2, 28),
-  },
-  {
-    id: "e4",
-    title: "New Desk (Wooden)",
-    amount: 450,
-    date: new Date(2021, 5, 12),
-  },
-];
-
 function App() {
-  const [expenses,setExpenses] = useState(DUMMY_EXPENSES);
+  const [expenses, setExpenses] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [httpError, setHttpError] = useState();
+
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      const respone = await fetch(
+        `${API_KEY}/expenses.json`
+      );
+
+      if (!respone.ok) {
+        throw new Error('Something went wrong!');
+      }
+
+      const responseData = await respone.json();
+
+      const loadedExpenses = [];
+
+      for (const expense in responseData) {
+        loadedExpenses.push({
+          id: expense,
+          title: responseData[expense].expenseData.title,
+          amount: responseData[expense].expenseData.amount,
+          date: new Date(responseData[expense].expenseData.date),
+        });
+      }
+      setExpenses(loadedExpenses);
+      setIsLoading(false);
+    };
+    fetchExpenses().catch((error) => {
+      setIsLoading(false);
+      setHttpError(error.message);
+    });
+  }, []);
+
+  let output = <Expenses items={expenses}></Expenses>;
+
+  if (isLoading) {
+    output = <h2 className="fallback">Loading...</h2>
+  }
+
+  if (httpError) {
+    output = (
+      <h2 className="fallback">{httpError}</h2>
+    );
+  }
+
   const addExpenseHandler = (expense) => {
     setExpenses(prevExpeneses => {
       return [expense,...prevExpeneses];
     })
   };
+  
   return (
     <div>
       <NewExpense onAddExpense={addExpenseHandler}/>
-      <Expenses items={expenses}></Expenses>
+      {output}
     </div>
   );
 }

@@ -13,3 +13,8 @@ body {
   background-color: #3f3f3f;
 }
 
+.fallback{
+  text-align: center;
+  color: white;
+}
+
