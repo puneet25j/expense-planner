@@ -1,7 +1,6 @@
 import React, {useState} from "react";
 
 import "./NewExpense.css";
-import {API_KEY} from '../../API';
 import ExpenseForm from "./ExpenseForm";
 
 function NewExpense(props) {
@@ -9,7 +8,7 @@ function NewExpense(props) {
 
   const saveExpenseDataHandler = async (expenseData) => {
     await fetch(
-      `${API_KEY}/expenses.json`,
+      `${process.env.REACT_APP_API_KEY}/expenses.json`,
       {
         method: 'POST',
         body: JSON.stringify({

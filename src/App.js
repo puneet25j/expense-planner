@@ -1,6 +1,5 @@
 import React,{useEffect, useState} from "react"
 
-import { API_KEY } from "./API";
 import Expenses from './components/Expenses/Expenses'
 import NewExpense from './components/NewExpense/NewExpense';
 
@@ -13,7 +12,7 @@ function App() {
   useEffect(() => {
     const fetchExpenses = async () => {
       const respone = await fetch(
-        `${API_KEY}/expenses.json`
+        `${process.env.REACT_APP_API_KEY}/expenses.json`
       );
 
       if (!respone.ok) {
